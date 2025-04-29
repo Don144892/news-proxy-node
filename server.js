@@ -10,6 +10,7 @@ app.use(cors());
 app.use(express.static("public"));
 
 const feeds = [
+  'https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja',
   'https://www3.nhk.or.jp/rss/news/cat0.xml',
   'https://news.yahoo.co.jp/rss/topics/top-picks.xml'
 ];
