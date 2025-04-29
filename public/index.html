@@ -21,14 +21,14 @@
     #news-text {
       font-size: 50vh;
       color: orange;
-      white-space: nowrap;
-      animation: scroll-left 150s linear infinite;
+      white-space: nowrap;/*
+      animation: scroll-left 150s linear infinite;*/
       font-family: 'Courier New', monospace;
     }
-    @keyframes scroll-left {
+    /*@keyframes scroll-left {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
-    }
+    }*/
   </style>
 </head>
 <body>
@@ -38,7 +38,8 @@
 
   <script>
     const endpoint = "/news"; // 同一オリジンなのでそのままでOK！
-
+const scrollSpeed = 100; // px per second
+    
     async function fetchNews() {
       try {
         const res = await fetch(endpoint);
