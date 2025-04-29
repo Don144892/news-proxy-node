@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ニュース電光掲示板</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      overflow: hidden;
+    }
+    #news-container {
+      white-space: nowrap;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    #news-text {
+      font-size: 50vh;
+      color: orange;
+      white-space: nowrap;
+      animation: scroll-left 24s linear infinite;
+      font-family: 'Courier New', monospace;
+    }
+    @keyframes scroll-left {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+  <div id="news-container">
+    <div id="news-text">読み込み中...</div>
+  </div>
+
+  <script>
+    const endpoint = "/news"; // 同一オリジンなのでそのままでOK！
+
+    async function fetchNews() {
+      try {
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error("HTTPエラー: " + res.status);
+        const data = await res.json();
+        const headlines = data.map(item => item.title);
+        document.getElementById("news-text").textContent = headlines.join(" ｜ ");
+      } catch (e) {
+        console.error("ニュース取得失敗:", e);
+        document.getElementById("news-text").textContent = "ニュースを取得できませんでした";
+      }
+    }
+
+    fetchNews();
+    setInterval(fetchNews, 10 * 60 * 1000); // 10分ごとに更新
+  </script>
+</body>
+</html>
