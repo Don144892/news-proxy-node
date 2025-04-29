@@ -36,7 +36,7 @@ app.get('/news', async (req, res) => {
     headlines.sort((a, b) => b.pubDate - a.pubDate);
 
     // 最新20件だけ返す
-    res.json(headlines.slice(0, 20));
+    res.json(headlines.slice(0, 40));
 
   } catch (error) {
     console.error(error);
