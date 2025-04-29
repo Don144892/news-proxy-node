@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ニュース電光掲示板（縦持ち対応）</title>
+  <title>ニュース電光掲示板（縦横切替＋縦書き対応）</title>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -60,36 +61,53 @@
     const textEl = document.getElementById("news-text");
     const container = document.getElementById("news-container");
 
-    let x = window.innerWidth;
-    let y = window.innerHeight;
     let intervalId = null;
-    let isVertical = window.innerHeight > window.innerWidth;
+    let isVertical = null;
+    let headlinesText = "読み込み中...";
 
-    if (isVertical) {
-      container.classList.add("vertical");
+    function detectOrientation() {
+      return window.innerHeight > window.innerWidth;
+    }
+
+    function formatText(text, vertical) {
+      if (vertical) {
+        return text.split("").map(c => `<span>${c}</span>`).join("<br>");
+      } else {
+        return text;
+      }
+    }
+
+    function updateLayout() {
+      const vertical = detectOrientation();
+
+      if (vertical !== isVertical) {
+        isVertical = vertical;
+        container.classList.toggle("vertical", isVertical);
+        if (isVertical) {
+          textEl.innerHTML = formatText(headlinesText, true);
+        } else {
+          textEl.textContent = headlinesText;
+        }
+        startScroll();
+      }
     }
 
     function startScroll() {
       clearInterval(intervalId);
-
       if (isVertical) {
-        let topPos = window.innerHeight;
+        let y = window.innerHeight;
         intervalId = setInterval(() => {
-          const textHeight = textEl.offsetHeight;
-          topPos -= scrollStep;
-          if (topPos < -textHeight) {
-            topPos = window.innerHeight;
-          }
-          wrapper.style.transform = `translateY(${topPos}px)`;
+          const h = textEl.offsetHeight;
+          y -= scrollStep;
+          if (y < -h) y = window.innerHeight;
+          wrapper.style.transform = `translateY(${y}px)`;
         }, 1000 / fps);
       } else {
-        x = window.innerWidth;
+        let x = window.innerWidth;
         intervalId = setInterval(() => {
-          const textWidth = textEl.offsetWidth;
+          const w = textEl.offsetWidth;
           x -= scrollStep;
-          if (x < -textWidth) {
-            x = window.innerWidth;
-          }
+          if (x < -w) x = window.innerWidth;
           wrapper.style.transform = `translateX(${x}px)`;
         }, 1000 / fps);
       }
@@ -101,23 +119,17 @@
         if (!res.ok) throw new Error("HTTPエラー: " + res.status);
         const data = await res.json();
         const headlines = data.map(item => item.title);
-        const joined = headlines.join("　　　｜　　　");
-
-        if (isVertical) {
-          textEl.innerHTML = joined.split("").map(c => `<span>${c}</span>`).join("<br>");
-        } else {
-          textEl.textContent = joined;
-        }
-
-        startScroll();
+        headlinesText = headlines.join("　　　｜　　　");
+        updateLayout();
       } catch (e) {
         console.error("ニュース取得失敗:", e);
-        textEl.textContent = "ニュースを取得できませんでした";
-        startScroll();
+        headlinesText = "ニュースを取得できませんでした";
+        updateLayout();
       }
     }
 
-    startScroll();
+    window.addEventListener("resize", updateLayout);
+
     fetchNews();
     setInterval(fetchNews, 10 * 60 * 1000);
   </script>
