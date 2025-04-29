@@ -82,7 +82,7 @@
         if (!res.ok) throw new Error("HTTPエラー: " + res.status);
         const data = await res.json();
         const headlines = data.map(item => item.title);
-        textEl.textContent = headlines.join(" ｜ ");
+        textEl.textContent = headlines.join("   ｜　　 ");
         startScroll();
       } catch (e) {
         console.error("ニュース取得失敗:", e);
