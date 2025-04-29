@@ -11,23 +11,19 @@
       overflow: hidden;
     }
     #news-container {
-      white-space: nowrap;
-      position: absolute;
+      position: relative;
       width: 100%;
-      height: 100%;
+      height: 100vh;
       display: flex;
       align-items: center;
     }
     #news-text {
+      position: absolute;
+      white-space: nowrap;
       font-size: 50vh;
       color: orange;
-      white-space: nowrap;
-      animation: scroll-left 150s linear infinite;
       font-family: 'Courier New', monospace;
-    }
-    @keyframes scroll-left {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
+      will-change: transform;
     }
   </style>
 </head>
@@ -37,9 +33,9 @@
   </div>
 
   <script>
-    const endpoint = "/news"; // 同一オリジンなのでそのままでOK！
-const scrollSpeed = 100; // px per second
-    
+    const endpoint = "/news";
+    const scrollSpeed = 100; // px per second
+
     async function fetchNews() {
       try {
         const res = await fetch(endpoint);
@@ -47,14 +43,40 @@ const scrollSpeed = 100; // px per second
         const data = await res.json();
         const headlines = data.map(item => item.title);
         document.getElementById("news-text").textContent = headlines.join(" ｜ ");
+        startScroll();
       } catch (e) {
         console.error("ニュース取得失敗:", e);
         document.getElementById("news-text").textContent = "ニュースを取得できませんでした";
       }
     }
 
+    function startScroll() {
+      const textEl = document.getElementById("news-text");
+      const containerWidth = document.body.clientWidth;
+      const textWidth = textEl.offsetWidth;
+
+      let start = null;
+      let x = containerWidth;
+
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = (timestamp - start) / 1000; // 秒
+        x = containerWidth - (elapsed * scrollSpeed);
+
+        if (x < -textWidth) {
+          start = null;
+          x = containerWidth;
+        }
+
+        textEl.style.transform = `translateX(${x}px)`;
+        requestAnimationFrame(step);
+      }
+
+      requestAnimationFrame(step);
+    }
+
     fetchNews();
-    setInterval(fetchNews, 10 * 60 * 1000); // 10分ごとに更新
+    setInterval(fetchNews, 10 * 60 * 1000); // 10分ごと更新
   </script>
 </body>
 </html>
