@@ -56,45 +56,59 @@
 
   <script>/*
     const endpoint = "/news";
-    const scrollStep = 30;
+    const scrollSpeed = 200; // px per second
+    const wrapper = document.getElementById("news-wrapper");
+    const textEl = document.getElementById("news-text");
+
+    let start = null;
+    let x = window.innerWidth;
+
+  
+    function startScroll() {
+      start = null;
+      x = window.innerWidth;
+
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = (timestamp - start) / 1000;
+        const offset = x - (elapsed * scrollSpeed);
+
+        if (textEl.offsetWidth > 0 && offset < -textEl.offsetWidth) {
+          start = null;
+          x = window.innerWidth;
+          requestAnimationFrame(step);
+          return;
+        }
+
+        wrapper.style.transform = `translateX(${offset}px)`;
+        requestAnimationFrame(step);
+      }
+
+      requestAnimationFrame(step);
+    }*/
+    const endpoint = "/news";
+    const scrollStep = 30; // px per step
     const fps = 10;
     const wrapper = document.getElementById("news-wrapper");
     const textEl = document.getElementById("news-text");
-    const container = document.getElementById("news-container");
 
     let x = window.innerWidth;
-    let y = window.innerHeight;
     let intervalId = null;
-    let isVertical = window.innerHeight > window.innerWidth;
-
-    if (isVertical) {
-      container.classList.add("vertical");
-    }
 
     function startScroll() {
       clearInterval(intervalId);
+      x = window.innerWidth;
 
-      if (isVertical) {
-        let topPos = window.innerHeight;
-        intervalId = setInterval(() => {
-          const textHeight = textEl.offsetHeight;
-          topPos -= scrollStep;
-          if (topPos < -textHeight) {
-            topPos = window.innerHeight;
-          }
-          wrapper.style.transform = `translateY(${topPos}px)`;
-        }, 1000 / fps);
-      } else {
-        x = window.innerWidth;
-        intervalId = setInterval(() => {
-          const textWidth = textEl.offsetWidth;
-          x -= scrollStep;
-          if (x < -textWidth) {
-            x = window.innerWidth;
-          }
-          wrapper.style.transform = `translateX(${x}px)`;
-        }, 1000 / fps);
-      }
+      intervalId = setInterval(() => {
+        const textWidth = textEl.offsetWidth;
+        x -= scrollStep;
+
+        if (x < -textWidth) {
+          x = window.innerWidth;
+        }
+
+        wrapper.style.transform = `translateX(${x}px)`;
+      }, 1000 / fps);
     }
 
     async function fetchNews() {
@@ -103,14 +117,7 @@
         if (!res.ok) throw new Error("HTTPエラー: " + res.status);
         const data = await res.json();
         const headlines = data.map(item => item.title);
-        const joined = headlines.join("　　　｜　　　");
-
-        if (isVertical) {
-          textEl.innerHTML = joined.split("").map(c => `<span>${c}</span>`).join("<br>");
-        } else {
-          textEl.textContent = joined;
-        }
-
+        textEl.textContent = headlines.join("   ｜　　 ");
         startScroll();
       } catch (e) {
         console.error("ニュース取得失敗:", e);
@@ -119,7 +126,7 @@
       }
     }
 
-    startScroll();
+    startScroll(); // 仮テキストで即時スタート
     fetchNews();
     setInterval(fetchNews, 10 * 60 * 1000);
   </script>
