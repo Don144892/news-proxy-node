@@ -79,7 +79,7 @@
   <script>
 
 function highlightKeywords(text) {
-  const keywords = ["地震", "漏えい", "津波", "台風", "意識不明", "行方不明", "墜落", "テロ", "戦争", "核戦争", "死傷", "殺害", "倒壊", "台風", "速報", "台風", "冠水", "水没", "台風", "渋滞", "重体", "死亡", "事故", "警報", "避難"];
+  const keywords = ["地震", "漏洩", "漏えい", "津波", "台風", "意識不明", "行方不明", "墜落", "テロ", "戦争", "核戦争", "死傷", "殺害", "倒壊", "台風", "速報", "台風", "冠水", "水没", "台風", "渋滞", "重体", "死亡", "事故", "警報", "避難"];
   keywords.forEach(word => {
     const re = new RegExp(word, "g");
     text = text.replace(re, `<span class="highlight">${word}</span>`);
