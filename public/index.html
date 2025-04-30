@@ -1,12 +1,23 @@
+貧しければ、変えようと考えて、頑張ろうと考え、革命をやろうと考える。一枚の白紙は何も背負っているものがなく文字を書くのに都合がいいし、最も新しく、美しい絵を描くのに都合がいい。50
+
+貧しければ、変えようと考えて、頑張ろうと考え、革命をやろうと考える。一枚の白紙は何も背負っているものがなく文字を書くのにも都合がいいし、最も新しく、美しい絵を描くのにも都合がいい
+
+69
+
+戦争ーそれは私有財産と階級が発生してからはじまった階級と階級、民族と民族、国家と国家、政治集団と政治集団とのあいだの、一定発程段階での矛盾を解決するためにとられる最高の闘争形態である。81
+
+103
+
+128
+朝礼で出荷の不備の主犯として名指しで自分が批判され、挙げ句に「話を聞く時の姿勢が悪い」だの「いつまで学生気分でいるのか」云々言いたい放題言われたが、のちに出荷の不備の原因はフィリピン人研修生にあり、自分が怒られる筋合はないことが判明した。これが意味することは「上司は現場で何が起こっているのかを把握していない」ということである。この一件に対して派遣のリフトのオッサンは「やっと上の人が外人が出荷準備してるって真実を知ったか。半年前からこうやがエエわけないやろ、とは思っておった。」とコメントしている。
+毛主席は「われわれは大衆を信じ、党を信じなければならない。この二つは根本的な原理でありこの原理を疑うなら何も成し遂げることはできない。」と言った。大衆を社員、党は会社と言い換えたとき、我々は何も成し遂げることができないということになる。
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>ニュース電光掲示板</title>
+  <title>ニュース電光掲示板（格子入り）</title>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -22,35 +33,48 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
-      justify-content: center;
       align-items: center;
     }
     #news-wrapper {
       position: absolute;
-      will-change: transform;
       white-space: nowrap;
+      will-change: transform;
     }
     #news-text {
       font-size: 50vh;
       color: orange;
       font-family: 'DotGothic16', monospace;
+      text-shadow:
+        0 0 5px orange,
+        0 0 10px orange,
+        0 0 20px red;
       line-height: 1;
     }
-    .vertical #news-text {
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      font-size: 8vh;
-      white-space: normal;
+
+    /* グリッドオーバーレイ */
+    #grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 8px 8px;
+      z-index: 999;
     }
+
+.highlight {
+  animation: blink 0.5s infinite;
+}
 
     @keyframes blink {
   0%, 100% { color: red; opacity: 1; }
   50% { color: red; opacity: 0.5; }
 }
 
-.highlight {
-  animation: blink 0.5s infinite;
-}
   </style>
 </head>
 <body>
@@ -58,12 +82,13 @@
     <div id="news-wrapper">
       <div id="news-text">読み込み中...</div>
     </div>
+    <div id="grid-overlay"></div>
   </div>
 
   <script>
 
-    function highlightKeywords(text) {
-  const keywords = ["地震", "津波", "台風", "速報", "渋滞", "重体", "死亡", 事故", "警報", "避難"];
+function highlightKeywords(text) {
+  const keywords = ["地震", "津波", "台風", "速報", "渋滞", "重体", "死亡", "事故", "警報", "避難"];
   keywords.forEach(word => {
     const re = new RegExp(word, "g");
     text = text.replace(re, `<span class="highlight">${word}</span>`);
@@ -72,62 +97,28 @@
 }
 
     const endpoint = "/news";
-    const scrollStep = 30;
-    const fps = 10;
+    const scrollStep = 10;
+    const fps = 5;
     const wrapper = document.getElementById("news-wrapper");
     const textEl = document.getElementById("news-text");
-    const container = document.getElementById("news-container");
 
+    let x = window.innerWidth;
     let intervalId = null;
-    let isVertical = null;
-    let headlinesText = "読み込み中...";
-
-    function detectOrientation() {
-      return window.innerHeight > window.innerWidth;
-    }
-
-    function formatText(text, vertical) {
-      if (vertical) {
-        return text.split("").map(c => `<span>${c}</span>`).join("<br>");
-      } else {
-        return text;
-      }
-    }
-
-    function updateLayout() {
-      const vertical = detectOrientation();
-      isVertical = vertical;
-
-      container.classList.toggle("vertical", isVertical);
-
-      if (isVertical) {
-        textEl.innerHTML = formatText(headlinesText, true);
-      } else {
-        textEl.textContent = headlinesText;
-      }
-
-      startScroll();
-    }
 
     function startScroll() {
       clearInterval(intervalId);
-      if (isVertical) {
-        let y = window.innerHeight;
-        intervalId = setInterval(() => {
-          const h = textEl.offsetHeight;
-          y -= scrollStep;
-          if (y < -h) y = window.innerHeight;
-          wrapper.style.transform = `translateY(${y}px)`;
-        }, 1000 / fps);
-      } else {
-        let x = window.innerWidth;
-        intervalId = setInterval(() => {
-          const w = textEl.offsetWidth;
-          x -= scrollStep;
-          if (x < -w) x = window.innerWidth;
-          wrapper.style.transform = `translateX(${x}px)`;
-        }, 1000 / fps);
-      }
+      x = window.innerWidth;
+
+      intervalId = setInterval(() => {
+        const textWidth = textEl.offsetWidth;
+        x -= scrollStep;
+
+        if (x < -textWidth) {
+          x = window.innerWidth;
+        }
+
+        wrapper.style.transform = `translateX(${x}px)`;
+      }, 1000 / fps);
     }
 
     async function fetchNews() {
@@ -136,17 +127,16 @@
         if (!res.ok) throw new Error("HTTPエラー: " + res.status);
         const data = await res.json();
         const headlines = data.map(item => item.title);
-        headlinesText = headlines.join("　　　｜　　　");
-        updateLayout();
+        textEl.textContent = headlines.join("　　　｜　　　");
+        startScroll();
       } catch (e) {
         console.error("ニュース取得失敗:", e);
-        headlinesText = "ニュースを取得できませんでした";
-        updateLayout();
+        textEl.textContent = "ニュースを取得できませんでした";
+        startScroll();
       }
     }
 
-    window.addEventListener("resize", updateLayout);
-
+    startScroll();
     fetchNews();
     setInterval(fetchNews, 10 * 60 * 1000);
   </script>
