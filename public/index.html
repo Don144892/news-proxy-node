@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ニュース電光掲示板（格子入り）</title>
+  <title>ニュース電光掲示板</title>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -54,6 +54,11 @@
 
 .highlight {
   animation: blink 0.5s infinite;
+  text-shadow:
+        0 0 5px crimson,
+        0 0 10px crimson,
+        0 0 20px midiumvioretred;
+      line-height: 1;
 }
 
     @keyframes blink {
@@ -83,8 +88,8 @@ function highlightKeywords(text) {
 }
 
     const endpoint = "/news";
-    const scrollStep = 10;
-    const fps = 5;
+    const scrollStep = 30;
+    const fps = 10;
     const wrapper = document.getElementById("news-wrapper");
     const textEl = document.getElementById("news-text");
 
