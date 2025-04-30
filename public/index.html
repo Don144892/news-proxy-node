@@ -31,10 +31,6 @@
       font-size: 50vh;
       color: orange;
       font-family: 'DotGothic16', monospace;
-      text-shadow:
-        0 0 5px orange,
-        0 0 10px orange,
-        0 0 20px red;
       line-height: 1;
     }
     .vertical #news-text {
@@ -43,6 +39,15 @@
       font-size: 8vh;
       white-space: normal;
     }
+
+    @keyframes blink {
+  0%, 100% { color: red; opacity: 1; }
+  50% { color: red; opacity: 0.5; }
+}
+
+.highlight {
+  animation: blink 0.5s infinite;
+}
   </style>
 </head>
 <body>
@@ -53,6 +58,16 @@
   </div>
 
   <script>
+
+    function highlightKeywords(text) {
+  const keywords = ["地震", "津波", "台風", "速報", "渋滞", "重体", "死亡", 事故", "警報", "避難"];
+  keywords.forEach(word => {
+    const re = new RegExp(word, "g");
+    text = text.replace(re, `<span class="highlight">${word}</span>`);
+  });
+  return text;
+}
+
     const endpoint = "/news";
     const scrollStep = 30;
     const fps = 10;
