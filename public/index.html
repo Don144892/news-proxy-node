@@ -76,20 +76,14 @@
       }
     }
 
-    function updateLayout() {
-      const vertical = detectOrientation();
-      isVertical = vertical;
-
-      container.classList.toggle("vertical", isVertical);
-
-      if (isVertical) {
-        textEl.innerHTML = formatText(headlinesText, true);
-      } else {
-        textEl.textContent = headlinesText;
-      }
-
-      startScroll();
-    }
+    function updateLayout(force = false) {
+  const newVertical = detectOrientation();
+  if (force || newVertical !== isVertical) {
+    isVertical = newVertical;
+    applyTextLayout();  // ← 縦持ちなら innerHTML に縦積み表示
+    startScroll();
+  }
+}
 
     function startScroll() {
       clearInterval(intervalId);
