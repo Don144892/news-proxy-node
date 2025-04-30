@@ -65,7 +65,23 @@
   0%, 100% { color: red; opacity: 1; }
   50% { color: red; opacity: 0.5; }
 }
-
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 16px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      font-family: sans-serif;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .fullscreen-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -77,7 +93,16 @@
   </div>
 
   <script>
-
+   function enterFullscreen() {
+      const docEl = document.documentElement;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen();
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) {
+        docEl.msRequestFullscreen();
+      }
+    }
 function highlightKeywords(text) {
   const keywords = ["地震", "漏洩", "漏えい", "津波", "台風", "意識不明", "行方不明", "墜落", "テロ", "戦争", "核戦争", "死傷", "殺害", "倒壊", "台風", "速報", "台風", "冠水", "水没", "台風", "渋滞", "重体", "死亡", "事故", "警報", "避難"];
   keywords.forEach(word => {
