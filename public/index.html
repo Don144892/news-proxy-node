@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>ニュース電光掲示板（全画面対応）</title>
+  <title>ニュース電光掲示板</title>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
     html, body {
@@ -38,23 +38,7 @@
         0 0 20px red;
       line-height: 1;
     }
-    .fullscreen-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 10px 16px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      font-family: sans-serif;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-    .fullscreen-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
+    
     .highlight {
       
   text-shadow:
@@ -81,7 +65,7 @@
   keywords.forEach(word => {
     const re = new RegExp(word, "g");
     text = text.replace(re, `<span class="highlight">${word}</span>`);
-  });
+  }
   return text;
 }
 
@@ -120,16 +104,7 @@
       }
     }
 
-    function enterFullscreen() {
-      const el = document.body;
-  if (el.requestFullscreen) {
-    el.requestFullscreen();
-  } else if (el.webkitRequestFullscreen) {
-    el.webkitRequestFullscreen();
-  } else if (el.msRequestFullscreen) {
-    el.msRequestFullscreen();
-  }
-}
+    
 
     fetchNews();
     setInterval(fetchNews, 10 * 60 * 1000);
